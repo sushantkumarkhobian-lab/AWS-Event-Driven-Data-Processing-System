@@ -138,101 +138,241 @@ AWS-Event-Driven-Data-Processing-System/
 
 # Setup & Deployment Guide
 
-Follow these steps to deploy the project on your own AWS account.
+# ⚙️ Steps to Reproduce the Project
 
-## 1. Clone the Repository
+## Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/sushantkumarkhobian-lab/AWS-Event-Driven-Data-Processing-System.git
+
 cd AWS-Event-Driven-Data-Processing-System
 ```
 
 ---
 
-## 2. Create an Amazon S3 Bucket
+## Step 2: Create a DynamoDB Table
 
-- Create a new S3 bucket.
-- Enable **Event Notifications**.
-- Configure an **Object Created** event.
+Create a DynamoDB table with the following configuration:
+
+| Property | Value |
+|----------|-------|
+| Table Name | `ProcessedStudents` |
+| Partition Key | `id` |
+| Type | String |
+
+Keep all other settings as default.
 
 ---
 
-## 3. Create the Processing Lambda
+## Step 3: Create an IAM Role for Lambda
 
-Create a Lambda function named:
+Create an IAM Role with **Lambda** as the trusted entity.
 
-```text
-ProcessStudentData
+Attach the following policies:
+
+- `AmazonDynamoDBFullAccess`
+- `AmazonS3ReadOnlyAccess`
+- `AWSLambdaBasicExecutionRole`
+
+Name the role:
+
+```
+EventDrivenLambdaRole
 ```
 
-- Upload the processing source code.
-- Use **Python 3.13** runtime.
-- Assign an IAM role with permissions for:
-  - Amazon S3
-  - Amazon DynamoDB
-  - CloudWatch Logs
-- Configure the S3 bucket as the event trigger.
+---
+
+## Step 4: Deploy the Processing Lambda
+
+Create a Lambda function:
+
+| Property | Value |
+|----------|-------|
+| Function Name | `ProcessStudentData` |
+| Runtime | Python 3.13 |
+| Execution Role | `EventDrivenLambdaRole` |
+
+Copy the code from:
+
+```
+lambda/ProcessStudentData.py
+```
+
+Deploy the function.
 
 ---
 
-## 4. Create a DynamoDB Table
+## Step 5: Deploy the Read Lambda
 
-Create a DynamoDB table and note its table name.
+Create another Lambda function:
 
-The processing Lambda stores all transformed student records inside this table.
+| Property | Value |
+|----------|-------|
+| Function Name | `GetStudentData` |
+| Runtime | Python 3.13 |
+| Execution Role | `EventDrivenLambdaRole` |
+
+Copy the code from:
+
+```
+lambda/GetStudentData.py
+```
+
+Deploy the function.
 
 ---
 
-## 5. Create the Retrieval Lambda
+## Step 6: Create an S3 Bucket
 
-Create another Lambda function named:
+Create an S3 bucket (bucket name must be globally unique).
 
-```text
+Example:
+
+```
+processstudentdata-yourname
+```
+
+Leave all other settings as default.
+
+---
+
+## Step 7: Configure the S3 Event Trigger
+
+Inside the S3 bucket:
+
+**Properties → Event Notifications → Create Event Notification**
+
+Configure it as follows:
+
+| Property | Value |
+|----------|-------|
+| Event Name | `StudentUploadEvent` |
+| Event Type | `All Object Create Events` |
+| Suffix | `.json` |
+| Destination | `Lambda Function` |
+| Lambda Function | `ProcessStudentData` |
+
+Save the notification.
+
+---
+
+## Step 8: Upload Sample Data
+
+Upload the provided `students.json` file to the S3 bucket.
+
+This automatically triggers the processing Lambda, which:
+
+- Reads the uploaded JSON
+- Processes and restructures the data
+- Stores the processed records in DynamoDB
+
+Verify:
+
+- CloudWatch Logs show a successful Lambda execution.
+- DynamoDB contains the processed student records.
+
+---
+
+## Step 9: Create an HTTP API
+
+Create an **HTTP API** in API Gateway.
+
+Configure:
+
+**Integration**
+
+```
 GetStudentData
 ```
 
-- Upload the retrieval source code.
-- Use **Python 3.13** runtime.
-- Grant read access to DynamoDB.
-- Return the stored records as JSON.
+**Route**
+
+```
+GET /students
+```
+
+Deploy the API using either the `$default` stage or a custom stage such as `prod`.
+
+Copy the generated Invoke URL.
+
+Example:
+
+```
+https://<api-id>.execute-api.<region>.amazonaws.com/students
+```
+
+or
+
+```
+https://<api-id>.execute-api.<region>.amazonaws.com/prod/students
+```
+
+Verify that opening the endpoint returns the processed JSON stored in DynamoDB.
 
 ---
 
-## 6. Configure API Gateway
+## Step 10: Configure the Frontend
 
-- Create a REST API.
-- Create a **GET** endpoint.
-- Integrate it with **GetStudentData**.
-- Enable **CORS**.
-- Deploy the API.
-- Copy the generated Invoke URL.
+Open:
 
----
+```
+frontend/script.js
+```
 
-## 7. Configure the Frontend
+Replace the placeholder API URL with your deployed API Gateway endpoint.
 
-Inside `frontend/script.js`, replace the API endpoint with your deployed API Gateway URL.
+Example:
 
 ```javascript
-const API_URL = "YOUR_API_GATEWAY_URL";
+const API_URL = "https://<api-id>.execute-api.<region>.amazonaws.com/students";
+```
+
+or
+
+```javascript
+const API_URL = "https://<api-id>.execute-api.<region>.amazonaws.com/prod/students";
 ```
 
 ---
 
-## 8. Launch an EC2 Instance
+## Step 11: Launch an EC2 Instance
 
-- Launch an Ubuntu EC2 instance.
-- Install Nginx.
+Launch an **Amazon Linux 2023** EC2 instance.
+
+Configure the Security Group to allow:
+
+- SSH (22)
+- HTTP (80)
+
+Connect to the instance using SSH.
+
+---
+
+## Step 12: Install Nginx
+
+Run:
 
 ```bash
-sudo apt update
-sudo apt install nginx -y
+sudo dnf update -y
+sudo dnf install nginx -y
+sudo systemctl enable nginx
+sudo systemctl start nginx
 ```
 
-Copy the frontend files into:
+---
 
-```text
-/var/www/html/
+## Step 13: Deploy the Frontend
+
+Remove the default Nginx webpage:
+
+```bash
+sudo rm -rf /usr/share/nginx/html/*
+```
+
+Copy the contents of the `frontend` folder into:
+
+```
+/usr/share/nginx/html/
 ```
 
 Restart Nginx:
@@ -241,23 +381,23 @@ Restart Nginx:
 sudo systemctl restart nginx
 ```
 
-Access the dashboard using:
+Open the EC2 Public IP in your browser:
 
-```text
-http://YOUR_EC2_PUBLIC_IP
 ```
+http://<EC2_PUBLIC_IP>
+```
+
+The Event-Driven Student Dashboard should now be accessible.
 
 ---
 
-## 9. Test the Event-Driven Workflow
+## Step 14: Test the Complete Workflow
 
-1. Upload a JSON file to the S3 bucket.
-2. Verify that **ProcessStudentData** executes automatically.
-3. Confirm the processed records are stored in DynamoDB.
-4. Open the EC2-hosted dashboard.
-5. The dashboard requests data through API Gateway.
-6. **GetStudentData** retrieves the records from DynamoDB.
-7. The updated student data is displayed automatically.
+1. Upload a new `students.json` file to the S3 bucket.
+2. Verify that the S3 event automatically invokes the `ProcessStudentData` Lambda.
+3. Confirm that the processed records are stored in DynamoDB.
+4. Open the hosted dashboard.
+5. The webpage automatically fetches the latest data from the API Gateway endpoint and displays the updated records without any manual intervention.
 
 ---
 
