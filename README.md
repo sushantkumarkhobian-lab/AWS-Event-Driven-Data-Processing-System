@@ -416,3 +416,13 @@ The Event-Driven Student Dashboard should now be accessible.
 Computer Science Engineering (IoT, Blockchain & Cyber Security)
 
 ---
+
+# License
+
+This project is licensed under the **MIT License**.
+
+See the [LICENSE](LICENSE) file for details.
+
+---
+
+## ⭐ If you found this project useful, consider giving it a star!
