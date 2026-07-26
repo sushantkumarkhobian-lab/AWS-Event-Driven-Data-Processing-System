@@ -40,7 +40,7 @@ This project demonstrates an automated serverless workflow where uploading a JSO
 
 ## Hosted Dashboard
 
-<img width="1917" height="962" alt="Screenshot 2026-07-25 203057" src="https://github.com/user-attachments/assets/6a255585-159c-471d-82c4-70cbc8735797" />
+<img width="1080" height="544" alt="image" src="https://github.com/user-attachments/assets/f2dbe298-64d3-46c9-b1b5-160d3b092b95" />
 
 *Responsive dashboard hosted on Amazon EC2 displaying processed student records.*
 
