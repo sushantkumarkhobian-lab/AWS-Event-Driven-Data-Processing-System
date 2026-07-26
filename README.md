@@ -138,8 +138,6 @@ AWS-Event-Driven-Data-Processing-System/
 
 # Setup & Deployment Guide
 
-# ⚙️ Steps to Reproduce the Project
-
 ## Step 1: Clone the Repository
 
 ```bash
