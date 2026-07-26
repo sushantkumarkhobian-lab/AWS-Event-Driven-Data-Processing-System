@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event-Driven Student Analytics Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for crisp UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <div class="app-container">
+        
+        <!-- Header Section -->
+        <header class="dashboard-header">
+            <div class="header-main">
+                <div class="logo-badge">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div>
+                    <h1>Event-Driven Student Dashboard</h1>
+                    <p class="subtitle">Real-time telemetry stream synchronized with <strong>AWS DynamoDB</strong></p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="live-status">
+                    <span class="pulse-dot"></span>
+                    <span class="status-text">LIVE SYNC</span>
+                </div>
+                <div class="last-sync-badge">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Updated: <strong id="updated">--:--:--</strong></span>
+                </div>
+                <button id="refreshBtn" class="btn-refresh" title="Refresh Data">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Metrics Grid -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">Total Students</span>
+                    <h3 id="count" class="metric-value">0</h3>
+                </div>
+                <div class="metric-footer">
+                    <span class="trend positive"><i class="fa-solid fa-database"></i> Active Records</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon purple">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">Class Average</span>
+                    <h3 id="avg-marks" class="metric-value">0.0</h3>
+                </div>
+                <div class="metric-footer">
+                    <span class="trend neutral"><i class="fa-solid fa-graduation-cap"></i> Overall Marks</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon emerald">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">Top Score</span>
+                    <h3 id="top-score" class="metric-value">0</h3>
+                </div>
+                <div class="metric-footer">
+                    <span class="trend positive"><i class="fa-solid fa-trophy"></i> Highest Marks</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon amber">
+                    <i class="fa-solid fa-city"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">Cities Covered</span>
+                    <h3 id="cities-count" class="metric-value">0</h3>
+                </div>
+                <div class="metric-footer">
+                    <span class="trend neutral"><i class="fa-solid fa-location-dot"></i> Geographical Spread</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Data Table Container -->
+        <main class="table-card">
+            
+            <!-- Toolbar for Search and Filter -->
+            <div class="table-toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Search student name, city, grade..." />
+                </div>
+                
+                <div class="filter-group">
+                    <select id="gradeFilter" class="filter-select">
+                        <option value="ALL">All Grades</option>
+                        <option value="A+">Grade A+</option>
+                        <option value="A">Grade A</option>
+                        <option value="B">Grade B</option>
+                        <option value="C">Grade C</option>
+                        <option value="F">Grade F</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table id="studentTable">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Marks</th>
+                            <th>Grade</th>
+                            <th>City</th>
+                            <th>Processed Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows injected via script.js -->
+                    </tbody>
+                </table>
+
+                <div id="emptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <p>No matching student records found</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p><i class="fa-brands fa-aws"></i> Powered by AWS API Gateway, Lambda & DynamoDB Event Stream</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

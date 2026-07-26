@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Rahul",
+    "marks": 88,
+    "city": "Bangalore"
+  },
+  {
+    "name": "Priya",
+    "marks": 76,
+    "city": "Hyderabad"
+  },
+  {
+    "name": "Arjun",
+    "marks": 91,
+    "city": "Jaipur"
+  },
+  {
+    "name": "Neha",
+    "marks": 67,
+    "city": "Ahmedabad"
+  },
+  {
+    "name": "Vikram",
+    "marks": 53,
+    "city": "Lucknow"
+  }
+]
